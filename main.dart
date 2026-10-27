@@ -75,9 +75,11 @@ class _HomePageState extends State<HomePage> {
         raw = await rootBundle.loadString('assets/combined_data.csv');
         await file.writeAsString(raw);
       }
+      // Some CSV editors export a UTF-8 BOM, which would corrupt the first header.
+      raw = raw.replaceFirst('\uFEFF', '');
       final parsed = const CsvToListConverter(eol: '\n').convert(raw.trimRight());
       if (parsed.isNotEmpty) {
-        final header = parsed.first.map((e) => e.toString()).toList();
+        final header = parsed.first.map((e) => e.toString().replaceFirst('\uFEFF', '').trim()).toList();
         records = parsed.skip(1).where((r) => r.isNotEmpty).map((row) {
           final map = <String, String>{};
           for (var i = 0; i < header.length; i++) {
@@ -170,12 +172,12 @@ class _HomePageState extends State<HomePage> {
     final n = name.text.trim();
     final perWeek = int.tryParse(sessions.text.trim());
     final termCount = int.tryParse(term.text.trim());
-    if (n.isEmpty || perWeek == null || perWeek < 1 || perWeek > 7 || termCount == null || selectedDays.isEmpty) {
+    if (n.isEmpty || perWeek == null || perWeek < 1 || perWeek > 7 || termCount == null || termCount < 0 || selectedDays.isEmpty) {
       _message(language == 'fa' ? 'نام، تعداد جلسات، ترم و حداقل یک روز کلاس را درست وارد کنید.' : 'Enter a name, valid session counts, and at least one class day.');
       return;
     }
     final duplicate = _student(n);
-    if (existing == null && duplicate != null) {
+    if (duplicate != null && !identical(duplicate, existing)) {
       _message(language == 'fa' ? 'این دانش‌آموز وجود دارد.' : 'Student already exists.');
       return;
     }
@@ -190,8 +192,16 @@ class _HomePageState extends State<HomePage> {
     };
     setState(() {
       if (existing != null) {
+        final oldName = existing['Name'] ?? '';
         final idx = records.indexOf(existing);
         records[idx] = data;
+        if (oldName != n) {
+          for (final row in records) {
+            if (row['RecordType'] == 'attendance' && row['Name'] == oldName) {
+              row['Name'] = n;
+            }
+          }
+        }
       } else {
         records.add(data);
       }

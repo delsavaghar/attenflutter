@@ -1,33 +1,21 @@
-# Attendance Flutter
+# Attendance Flutter appp(corrected source files)
 
-Flutter starter project migrated from the uploaded Kivy attendance application.
+This folder contains the corrected Dart source, `pubspec.yaml`, and the CSV seed file at the exact asset path expected by the app.
 
-## Build an Android APK with Codemagic (without installing Flutter locally)
+## Files
+- `main.dart` — place at `lib/main.dart` in a Flutter project.
+- `pubspec.yaml` — project dependencies and asset declaration.
+- `assets/combined_data.csv` — initial data file. Keep this exact path and filename.
 
-This repository includes `codemagic.yaml`. The workflow first runs
-`flutter create --platforms=android .` to generate the missing Android platform
-folder in Codemagic's temporary build checkout, then resolves dependencies and
-builds a debug APK. The generated Android files are created during the cloud
-build and do not need to be present in GitHub beforehand.
+## Build
+1. Create a Flutter project if you do not already have one: `flutter create attendance_flutter`
+2. Replace its `pubspec.yaml` with this folder's `pubspec.yaml`.
+3. Copy this folder's `main.dart` to `attendance_flutter/lib/main.dart`.
+4. Copy this folder's `assets/combined_data.csv` to `attendance_flutter/assets/combined_data.csv`.
+5. From the project directory run: `flutter pub get`
+6. Check source: `flutter analyze`
+7. Build APK: `flutter build apk --release`
 
-1. Upload/commit all files in this project to the root of the GitHub repository.
-2. In Codemagic, open the app connected to this repository.
-3. If Codemagic offers workflow selection, select the workflow from `codemagic.yaml`
-   named **Attendance Flutter Android APK**. YAML configuration takes precedence
-   over Workflow Editor settings when a YAML workflow is used.
-4. Start the `android-apk` workflow on branch `main`.
-5. When successful, download the APK from the build's Artifacts section.
+The APK is normally created at `build/app/outputs/flutter-apk/app-release.apk`.
 
-## CSV storage
-
-- `assets/combined_data.csv` is the initial dataset bundled with the app.
-- On first launch it is copied into the app's documents directory.
-- Changes are written to the app's private `combined_data.csv`, not back into the bundled asset.
-- To replace the initial data before first launch, replace the asset CSV and rebuild.
-- CSV header and RecordType values are retained: `student`, `attendance`, `label`.
-
-## Current implementation
-
-Includes student list/search, labels filtering, add/edit/delete students, class-day selection, attendance registration with optional pending flag and date picker, remaining-session decrement, term renewal, reports, class-day calendar, language toggle, and local CSV persistence.
-
-This is a generated migration starter. The Android build must still be run in Codemagic to verify compilation.
+Note: Flutter/Dart SDK was not available in the current execution environment, so `flutter analyze` and APK compilation could not be run here. The files have been corrected by source inspection, but a successful build is not claimed until those commands run in a Flutter environment.
